@@ -1,4 +1,4 @@
-const socket = io("http://217.154.185.231:3000/");
+const socket = io("https://susgame.duckdns.org/");
 
 let isHost = false;
 let currentPlayersCount = 0;
