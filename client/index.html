@@ -140,9 +140,11 @@
   display:grid;
   grid-template-columns: repeat(2, 1fr);
   gap:12px;
-  margin-bottom:16px;
-  list-style: none;
+  margin:0 auto 16px;
+  padding:0;
+  max-width:260px;   /* 👈 MISMO ANCHO visual que los botones */
 }
+
 
 .players li{
   background:linear-gradient(135deg,#6a89ff,#9f9cff);
@@ -153,6 +155,10 @@
   font-size:1rem;
   box-shadow:0 6px 0 rgba(0,0,0,.15);
   list-style: none;
+    display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
 
@@ -262,6 +268,7 @@
   transform:scale(.95);
 }
 
+
   </style>
 </head>
 
@@ -346,6 +353,7 @@
     <p><strong>5. Importante</strong><br>
     Cada ronda genera una nueva palabra y un nuevo impostor.<br>
     Solo el host puede iniciar una nueva ronda.</p>
+    
 
     <button id="closeHelpModal" class="btn primary">Entendido</button>
   </div>
