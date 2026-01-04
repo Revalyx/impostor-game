@@ -3,53 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <title>Impostor Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #1e1e2f;
-      color: white;
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2b2d42, #0f1020);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: #fff;
+    }
+
+    .container {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 16px;
     }
 
     .card {
-      background: #2a2a40;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      text-align: center;
-    }
-
-    input, button {
+      background: #1e1f36;
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: none;
+      max-width: 360px;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.45);
     }
 
-    button {
-      background: #ff4d4d;
-      color: white;
+    .title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .subtitle {
+      margin-top: 24px;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      text-align: center;
+      opacity: .9;
+    }
+
+    .welcome {
+      text-align: center;
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input::placeholder {
+      opacity: .6;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
+      transition: transform .1s, opacity .1s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      opacity: .95;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #ff4d4d, #ff7a7a);
+      color: #fff;
+    }
+
+    .secondary {
+      background: #2f3158;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .danger {
+      background: #ff3b3b;
+      margin-top: 16px;
+    }
+
+    .form {
+      margin-top: 12px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .rooms li,
+    .players li {
+      background: #2a2c4d;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s;
+    }
+
+    .rooms li:hover {
+      background: #3a3d6b;
+    }
+
+    .players li {
+      cursor: default;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>Impostor Game</h2>
+  <div class="container">
+    <div class="card">
 
-    <div id="login">
-      <input type="text" id="nameInput" placeholder="Tu nombre">
-      <button id="joinBtn">Entrar</button>
-    </div>
+      <h1 class="title">Impostor Game</h1>
 
-    <div id="welcome" style="display:none;">
-      <p>Bienvenido, <strong id="playerName"></strong></p>
+      <!-- LOGIN -->
+      <div id="login">
+        <input type="text" id="nameInput" placeholder="Tu nombre">
+        <button id="joinBtn" class="btn primary">Entrar</button>
+      </div>
+
+      <!-- LOBBY -->
+      <div id="menu" style="display:none;">
+        <p class="welcome">
+          Hola, <strong id="playerName"></strong>
+        </p>
+
+        <button id="showCreateRoomBtn" class="btn secondary">
+          Crear sala
+        </button>
+
+        <div id="createRoomForm" class="form" style="display:none;">
+          <input type="text" id="roomName" placeholder="Nombre de la sala">
+          <input type="password" id="roomPassword" placeholder="Contraseña (opcional)">
+          <button id="createRoomBtn" class="btn primary">
+            Crear
+          </button>
+        </div>
+
+        <h2 class="subtitle">Salas disponibles</h2>
+        <ul id="roomsList" class="rooms"></ul>
+      </div>
+
+      <!-- SALA -->
+      <div id="room" style="display:none;">
+        <h2 class="subtitle">Jugadores en la sala</h2>
+        <ul id="playersList" class="players"></ul>
+        <button id="startGameBtn" class="btn primary" style="display:none;">
+            Iniciar partida
+        </button>
+
+        <button id="leaveRoomBtn" class="btn danger">
+          Salir de la sala
+        </button>
+      </div>
+
+<div id="game" style="display:none;">
+  <h2 id="roleText"></h2>
+  <h1 id="timerText"></h1>
+  <h3 id="starterText"></h3>
+
+  <button id="endGameBtn" class="btn danger" style="display:none;">
+    Terminar partida
+  </button>
+</div>
+
+
+
+
     </div>
   </div>
 
