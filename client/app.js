@@ -3,6 +3,13 @@ const socket = io("https://susgame.duckdns.org/");
 let isHost = false;
 let currentPlayersCount = 0;
 
+const helpBtn = document.getElementById("helpBtn");
+  const helpModal = document.getElementById("helpModal");
+  const closeHelpModal = document.getElementById("closeHelpModal");
+
+  helpBtn.onclick = () => helpModal.style.display = "flex";
+  closeHelpModal.onclick = () => helpModal.style.display = "none";
+
 // ================= VISTAS =================
 const loginDiv = document.getElementById("login");
 const menuDiv = document.getElementById("menu");

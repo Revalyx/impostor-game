@@ -37,6 +37,7 @@
       padding: 26px;
       box-shadow: 0 20px 50px rgba(0,0,0,.15);
       animation: pop .4s ease;
+      position:relative
     }
 
     @keyframes pop {
@@ -241,6 +242,26 @@
       max-width: 360px;
       box-shadow: 0 20px 40px rgba(0,0,0,.25);
     }
+
+    .help-btn{
+  position:absolute;
+  top:20px;
+  right:20px;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:none;
+  background:#ffd166;
+  font-size:1.2rem;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 6px 0 rgba(0,0,0,.15);
+}
+
+.help-btn:active{
+  transform:scale(.95);
+}
+
   </style>
 </head>
 
@@ -250,6 +271,8 @@
   <div class="card">
 
     <h1 class="title">EL IMPOSTOR</h1>
+    <button id="helpBtn" class="help-btn" aria-label="Cómo jugar">❓</button>
+
 
     <!-- LOGIN -->
     <div id="login">
@@ -304,8 +327,35 @@
   </div>
 </div>
 
+<div id="helpModal" class="modal">
+  <div class="modal-card">
+    <h2 class="subtitle">Cómo jugar</h2>
+
+    <p><strong>1. Inicio de ronda</strong><br>
+    La app asigna una palabra secreta y un impostor.</p>
+
+    <p><strong>2. Juego en persona</strong><br>
+    Todos juegan hablando en persona. La app solo muestra la palabra.</p>
+
+    <p><strong>3. Durante la ronda</strong><br>
+    La palabra no cambia mientras dure la ronda.</p>
+
+    <p><strong>4. Nueva ronda</strong><br>
+    Cuando termina la ronda, el <strong>host</strong> pulsa <em>Otra ronda</em>.</p>
+
+    <p><strong>5. Importante</strong><br>
+    Cada ronda genera una nueva palabra y un nuevo impostor.<br>
+    Solo el host puede iniciar una nueva ronda.</p>
+
+    <button id="closeHelpModal" class="btn primary">Entendido</button>
+  </div>
+</div>
+
+
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="app.js"></script>
+
+
 
 </body>
 </html>
