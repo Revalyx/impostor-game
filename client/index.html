@@ -3,10 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>Impostor Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #2a2a40;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background: #ff4d4d;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>Impostor Game</h1>
-  <p>Conectando al servidor...</p>
+
+  <div class="card">
+    <h2>Impostor Game</h2>
+
+    <div id="login">
+      <input type="text" id="nameInput" placeholder="Tu nombre">
+      <button id="joinBtn">Entrar</button>
+    </div>
+
+    <div id="welcome" style="display:none;">
+      <p>Bienvenido, <strong id="playerName"></strong></p>
+    </div>
+  </div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="app.js"></script>

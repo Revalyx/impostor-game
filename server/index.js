@@ -15,10 +15,18 @@ app.use(express.static(path.join(__dirname, "../client")));
 io.on("connection", (socket) => {
   console.log("Jugador conectado:", socket.id);
 
+  socket.on("set_name", (name) => {
+    socket.data.name = name;
+    console.log(`Jugador ${socket.id} se llama ${name}`);
+
+    socket.emit("name_confirmed", name);
+  });
+
   socket.on("disconnect", () => {
     console.log("Jugador desconectado:", socket.id);
   });
 });
+
 
 server.listen(3000, () => {
   console.log("Servidor escuchando en http://localhost:3000");
