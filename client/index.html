@@ -5,199 +5,221 @@
   <title>Impostor Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #2b2d42, #0f1020);
-      font-family: "Segoe UI", system-ui, sans-serif;
-      color: #fff;
-    }
-
-    .container {
+      font-family: "Nunito", system-ui, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
     }
 
     .card {
-      background: #1e1f36;
-      width: 100%;
-      max-width: 360px;
-      padding: 28px;
-      border-radius: 18px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.45);
+      background: white;
+      border-radius: 26px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.25);
     }
 
     .title {
+      font-family: "Fredoka", cursive;
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: .5px;
+      font-size: 2rem;
+      color: #ff4d4d;
+      margin-bottom: 16px;
     }
 
     .subtitle {
-      margin-top: 24px;
-      margin-bottom: 12px;
-      font-size: 1.1rem;
       text-align: center;
-      opacity: .9;
-    }
-
-    .welcome {
-      text-align: center;
-      margin-bottom: 16px;
-      opacity: 0.9;
+      font-weight: 700;
+      margin: 20px 0 12px;
     }
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-      border: none;
+      padding: 14px;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      border: 2px solid #eee;
       font-size: 1rem;
-      outline: none;
-    }
-
-    input::placeholder {
-      opacity: .6;
     }
 
     .btn {
       width: 100%;
-      padding: 12px;
-      border-radius: 14px;
+      padding: 14px;
+      border-radius: 18px;
       border: none;
-      font-size: 1rem;
-      font-weight: bold;
+      font-size: 1.05rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: transform .1s, opacity .1s;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      opacity: .95;
-    }
-
-    .primary {
-      background: linear-gradient(135deg, #ff4d4d, #ff7a7a);
-      color: #fff;
-    }
-
-    .secondary {
-      background: #2f3158;
-      color: #fff;
       margin-bottom: 10px;
     }
 
-    .danger {
-      background: #ff3b3b;
-      margin-top: 16px;
-    }
+    .primary { background: linear-gradient(135deg,#ff4d4d,#ff884d); color:white; }
+    .secondary { background: linear-gradient(135deg,#6a89ff,#9f9cff); color:white; }
+    .danger { background: linear-gradient(135deg,#ff3b3b,#ff6b6b); color:white; }
 
-    .form {
-      margin-top: 12px;
-    }
+    ul { list-style: none; padding: 0; margin: 0; }
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+    .rooms-grid { display: grid; gap: 12px; }
 
-    .rooms li,
-    .players li {
-      background: #2a2c4d;
-      padding: 10px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      text-align: center;
+    .room-card {
+      background: #fff1ec;
+      border-radius: 18px;
+      padding: 14px;
       cursor: pointer;
-      transition: background .15s;
     }
 
-    .rooms li:hover {
-      background: #3a3d6b;
+    .players {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .players li {
-      cursor: default;
+      background: #f0f0ff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    /* CARD REVEAL */
+    .card-reveal {
+      perspective: 1000px;
+      width: 220px;
+      height: 140px;
+      margin: 20px auto;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .8s ease;
+    }
+
+    .card-reveal.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Fredoka", cursive;
+      font-size: 1.5rem;
+    }
+
+    .card-front {
+      background: linear-gradient(135deg,#6a89ff,#9f9cff);
+      color: white;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg,#ffecd2,#fcb69f);
+      transform: rotateY(180deg);
+      color: #333;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-card {
+      background: white;
+      padding: 24px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 360px;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="container">
-    <div class="card">
+<div class="container">
+  <div class="card">
 
-      <h1 class="title">Impostor Game</h1>
+    <h1 class="title">🕵️‍♂️ Impostor Game</h1>
 
-      <!-- LOGIN -->
-      <div id="login">
-        <input type="text" id="nameInput" placeholder="Tu nombre">
-        <button id="joinBtn" class="btn primary">Entrar</button>
-      </div>
+    <!-- LOGIN -->
+    <div id="login">
+      <input id="nameInput" placeholder="¿Cómo te llamas?">
+      <button id="joinBtn" class="btn primary">Entrar</button>
+    </div>
 
-      <!-- LOBBY -->
-      <div id="menu" style="display:none;">
-        <p class="welcome">
-          Hola, <strong id="playerName"></strong>
-        </p>
+    <!-- LOBBY -->
+    <div id="menu" style="display:none;">
+      <p>Hola <strong id="playerName"></strong></p>
+      <button id="openCreateRoomModal" class="btn secondary">➕ Crear sala</button>
+      <h2 class="subtitle">Salas</h2>
+      <div id="roomsContainer" class="rooms-grid"></div>
+    </div>
 
-        <button id="showCreateRoomBtn" class="btn secondary">
-          Crear sala
-        </button>
+    <!-- ROOM -->
+    <div id="room" style="display:none;">
+      <h2 class="subtitle">Jugadores</h2>
+      <ul id="playersList" class="players"></ul>
+      <button id="startGameBtn" class="btn primary" style="display:none;">Iniciar partida</button>
+      <button id="leaveRoomBtn" class="btn danger">Salir</button>
+    </div>
 
-        <div id="createRoomForm" class="form" style="display:none;">
-          <input type="text" id="roomName" placeholder="Nombre de la sala">
-          <input type="password" id="roomPassword" placeholder="Contraseña (opcional)">
-          <button id="createRoomBtn" class="btn primary">
-            Crear
-          </button>
+    <!-- GAME -->
+    <div id="game" style="display:none;">
+      <div id="cardReveal" class="card-reveal">
+        <div class="card-inner">
+          <div class="card-front">🃏</div>
+          <div class="card-back"><h2 id="roleText"></h2></div>
         </div>
-
-        <h2 class="subtitle">Salas disponibles</h2>
-        <ul id="roomsList" class="rooms"></ul>
       </div>
+      <h1 id="timerText"></h1>
+      <h3 id="starterText"></h3>
+      <p id="hintText"></p>
+      <button id="newRoundBtn" class="btn secondary" style="display:none;">Nueva ronda</button>
+      <button id="endGameBtn" class="btn danger" style="display:none;">Terminar</button>
+    </div>
 
-      <!-- SALA -->
-      <div id="room" style="display:none;">
-        <h2 class="subtitle">Jugadores en la sala</h2>
-        <ul id="playersList" class="players"></ul>
-        <button id="startGameBtn" class="btn primary" style="display:none;">
-            Iniciar partida
-        </button>
-
-        <button id="leaveRoomBtn" class="btn danger">
-          Salir de la sala
-        </button>
-      </div>
-
-<div id="game" style="display:none;">
-  <h2 id="roleText"></h2>
-  <h1 id="timerText"></h1>
-  <h3 id="starterText"></h3>
-
-  <button id="endGameBtn" class="btn danger" style="display:none;">
-    Terminar partida
-  </button>
+  </div>
 </div>
 
-
-
-
-    </div>
+<!-- MODAL -->
+<div id="createRoomModal" class="modal">
+  <div class="modal-card">
+    <input id="roomName" placeholder="Nombre sala">
+    <input id="roomPassword" placeholder="Contraseña">
+    <button id="createRoomBtn" class="btn primary">Crear</button>
+    <button id="closeCreateRoomModal" class="btn danger">Cancelar</button>
   </div>
+</div>
 
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="app.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

@@ -2,187 +2,300 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
-const crypto = require("crypto");
+const { randomUUID } = require("crypto");
+
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" }
-});
+const io = new Server(server);
 
-// =====================
-// CONFIG
-// =====================
-const PREVIEW_COUNTDOWN = 5;
-const WORDS = ["COCHE", "PLAYA", "GATO", "ORDENADOR", "PLÁTANO"];
-
-// =====================
-// ESTADO
-// =====================
-const rooms = {};
-// room = {
-//   name,
-//   password,
-//   hostId,
-//   players: [{id, name}],
-//   started,
-//   impostorId,
-//   word
-// }
-
-// =====================
 app.use(express.static(path.join(__dirname, "../client")));
 
-// =====================
-// SOCKETS
-// =====================
-io.on("connection", (socket) => {
+const rooms = {};
 
-  socket.on("set_name", (name) => {
+/* =========================
+   HELPERS
+========================= */
+
+function emitRoomsList() {
+  const list = Object.values(rooms).map(r => ({
+    id: r.id,          // 🔴 SI ESTO NO VA, NO HAY JOIN
+    name: r.name,
+    players: r.players.length,
+    hasPassword: !!r.password
+  }));
+
+  console.log("📤 ROOMS_LIST:", list); // 👈 DEBUG REAL
+  io.emit("rooms_list", list);
+}
+
+
+
+
+
+function emitRoomState(roomId) {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  io.to(roomId).emit("room_state", {
+    roomId: room.id,
+    roomName: room.name,
+    players: room.players,
+    hostId: room.hostId
+  });
+}
+
+
+/* =========================
+   SOCKET
+========================= */
+
+io.on("connection", socket => {
+  console.log("🟢 Conectado:", socket.id);
+
+  /* ---- LOGIN ---- */
+  socket.on("set_name", name => {
+    if (!name) return;
     socket.data.name = name;
-    socket.data.room = null;
     socket.emit("name_confirmed", name);
-    sendRoomsList();
+    emitRoomsList();
   });
 
-  socket.on("create_room", ({ room, password }) => {
-    if (!room || rooms[room]) return;
+  /* ---- CREAR SALA ---- */
+socket.on("create_room", ({ room, password }) => {
+  if (!socket.data.name) return;
+  if (!room) return;
 
-    rooms[room] = {
-      name: room,
-      password,
-      hostId: socket.id,
-      players: [],
-      started: false
-    };
+const roomId = randomUUID();
 
-    sendRoomsList();
-  });
+rooms[roomId] = {
+  id: roomId,        // 🔴 SIN ESTO NO FUNCIONA
+  name: room,
+  players: [],
+  hostId: socket.id,
+  password: password || null
+};
 
-  socket.on("join_room", ({ room, password }) => {
-    const r = rooms[room];
-    if (!r || r.started) return;
-    if (r.password !== password) return;
 
-    if (socket.data.room) leaveRoom(socket);
+  joinRoom(socket, roomId);
+});
 
-    socket.join(room);
-    socket.data.room = room;
 
-    if (!r.players.find(p => p.id === socket.id)) {
-      r.players.push({ id: socket.id, name: socket.data.name });
+
+  /* ---- UNIRSE ---- */
+socket.on("join_room", ({ roomId, password }) => {
+  console.log("JOIN_ROOM recibido:", roomId, password); // 🔥 DEBUG
+
+  if (!socket.data.name) return;
+  if (!rooms[roomId]) {
+    console.log("❌ Sala no existe:", roomId);
+    return;
+  }
+
+  const room = rooms[roomId];
+
+  if (room.password && room.password !== password) {
+    socket.emit("join_error", "Contraseña incorrecta");
+    return;
+  }
+
+  joinRoom(socket, roomId);
+});
+
+
+
+
+/* =========================
+   START GAME  ✅ AQUÍ
+========================= */
+socket.on("start_game", () => {
+  const roomName = socket.data.roomId;
+  if (!roomName || !rooms[roomName]) return;
+
+  const room = rooms[roomName];
+
+  // Solo el host puede iniciar
+  if (room.hostId !== socket.id) return;
+
+  io.to(roomName).emit("pre_countdown", { seconds: 5 });
+
+  setTimeout(() => {
+    const impostor =
+      room.players[Math.floor(Math.random() * room.players.length)];
+
+    const word = "Manzana";
+
+    room.players.forEach(p => {
+      io.to(p.id).emit("reveal_role", {
+        role: p.id === impostor.id ? "impostor" : "player",
+        word
+      });
+    });
+
+    const starter =
+      room.players[Math.floor(Math.random() * room.players.length)];
+
+    io.to(roomName).emit("starter_selected", {
+      name: starter.name,
+      hostId: room.hostId
+    });
+  }, 5000);
+});
+
+socket.on("new_round", () => {
+  const roomName = socket.data.roomId;
+  if (!roomName || !rooms[roomName]) return;
+
+  const room = rooms[roomName];
+  if (room.hostId !== socket.id) return;
+
+  io.to(roomName).emit("pre_countdown", { seconds: 5 });
+
+  setTimeout(() => {
+    const impostor =
+      room.players[Math.floor(Math.random() * room.players.length)];
+
+    const word = "Manzana"; // luego lo harás dinámico
+
+    room.players.forEach(p => {
+      io.to(p.id).emit("reveal_role", {
+        role: p.id === impostor.id ? "impostor" : "player",
+        word
+      });
+    });
+
+    const starter =
+      room.players[Math.floor(Math.random() * room.players.length)];
+
+    io.to(roomName).emit("starter_selected", {
+      name: starter.name,
+      hostId: room.hostId
+    });
+  }, 5000);
+});
+
+socket.on("end_game", () => {
+  const roomId = socket.data.roomId;
+  if (!roomId || !rooms[roomId]) return;
+
+  const room = rooms[roomId];
+  if (room.hostId !== socket.id) return;
+
+  // avisar a todos
+  io.to(roomId).emit("room_closed");
+
+  // sacar a todos del room
+  const socketsInRoom = io.sockets.adapter.rooms.get(roomId);
+  if (socketsInRoom) {
+    for (const sid of socketsInRoom) {
+      const s = io.sockets.sockets.get(sid);
+      if (s) {
+        s.leave(roomId);
+        s.data.roomId = null;
+      }
     }
+  }
 
-    socket.emit("joined_room", {
-      players: r.players,
-      isHost: socket.id === r.hostId
-    });
+  delete rooms[roomId];
+  emitRoomsList();
+});
 
-    io.to(room).emit("room_update", { players: r.players });
-    sendRoomsList();
+
+
+
+
+function joinRoom(socket, roomId) {
+  const room = rooms[roomId];
+  if (room.players.some(p => p.id === socket.id)) return;
+
+  socket.join(roomId);
+  socket.data.roomId = roomId;
+
+  room.players.push({
+    id: socket.id,
+    name: socket.data.name
   });
 
-  // =====================
-  // START GAME
-  // =====================
-  socket.on("start_game", () => {
-    const roomName = socket.data.room;
-    const r = rooms[roomName];
-    if (!r || socket.id !== r.hostId) return;
-    if (r.players.length < 3) return;
+  emitRoomState(roomId);
+  emitRoomsList();
+}
 
-    r.started = true;
 
-    // Elegir impostor (aleatorio real)
-    const impostor = getRandomPlayer(r.players);
-
-    // Elegir jugador inicial (aleatorio real)
-    const starter = getRandomPlayer(r.players);
-
-    r.impostorId = impostor.id;
-    r.word = WORDS[crypto.randomInt(0, WORDS.length)];
-
-    // Pre-countdown
-    io.to(roomName).emit("pre_countdown", {
-      seconds: PREVIEW_COUNTDOWN
-    });
-
-    setTimeout(() => {
-      // Enviar roles
-      r.players.forEach(p => {
-        if (p.id === r.impostorId) {
-          io.to(p.id).emit("reveal_role", { role: "impostor" });
-        } else {
-          io.to(p.id).emit("reveal_role", {
-            role: "player",
-            word: r.word
-          });
-        }
-      });
-
-      // Enviar jugador inicial
-      io.to(roomName).emit("starter_selected", {
-        name: starter.name
-      });
-
-    }, PREVIEW_COUNTDOWN * 1000);
-  });
-
-  // =====================
-  // END GAME
-  // =====================
-  socket.on("end_game", () => {
-    const roomName = socket.data.room;
-    const r = rooms[roomName];
-    if (!r || socket.id !== r.hostId) return;
-
-    r.started = false;
-    io.to(roomName).emit("game_ended");
-    sendRoomsList();
-  });
-
+  /* ---- SALIR ---- */
   socket.on("leave_room", () => {
-    leaveRoom(socket);
-    sendRoomsList();
+    const roomName = socket.data.roomId;
+    if (!roomName || !rooms[roomName]) return;
+
+    const room = rooms[roomName];
+
+    // 🔴 SI SALE EL HOST → SE CIERRA LA SALA
+if (room.hostId === socket.id) {
+  io.to(roomName).emit("room_closed");
+
+  // 🔥 LIMPIAR SOCKET.IO ROOM
+  const socketsInRoom = io.sockets.adapter.rooms.get(roomName);
+  if (socketsInRoom) {
+    for (const socketId of socketsInRoom) {
+      const s = io.sockets.sockets.get(socketId);
+      if (s) {
+        s.leave(roomName);
+        s.data.room = null; // 🔥 CLAVE
+      }
+    }
+  }
+
+  delete rooms[roomName];
+  emitRoomsList();
+  return;
+}
+
+
+
+    // Si no es host, simplemente se va
+    room.players = room.players.filter(p => p.id !== socket.id);
+    socket.leave(roomName);
+    socket.data.roomId = null;
+
+    emitRoomState(roomName);
+    emitRoomsList();
   });
 
+  /* ---- DESCONECTAR ---- */
   socket.on("disconnect", () => {
-    leaveRoom(socket);
-    sendRoomsList();
+    const roomName = socket.data.roomId;
+    if (!roomName || !rooms[roomName]) return;
+
+    const room = rooms[roomName];
+
+    // 🔴 SI SE DESCONECTA EL HOST → SE CIERRA LA SALA
+if (room.hostId === socket.id) {
+  io.to(roomName).emit("room_closed");
+
+  // 🔥 LIMPIAR SOCKET.IO ROOM
+  const socketsInRoom = io.sockets.adapter.rooms.get(roomName);
+  if (socketsInRoom) {
+    for (const socketId of socketsInRoom) {
+      const s = io.sockets.sockets.get(socketId);
+      if (s) {
+        s.leave(roomName);
+        s.data.room = null; // 🔥 CLAVE
+      }
+    }
+  }
+
+  delete rooms[roomName];
+  emitRoomsList();
+  return;
+}
+
+
+
+    room.players = room.players.filter(p => p.id !== socket.id);
+    emitRoomState(roomName);
+    emitRoomsList();
   });
 });
 
-// =====================
-// HELPERS
-// =====================
-function getRandomPlayer(players) {
-  const index = crypto.randomInt(0, players.length);
-  return players[index];
-}
-
-function leaveRoom(socket) {
-  const roomName = socket.data.room;
-  if (!roomName || !rooms[roomName]) return;
-
-  const r = rooms[roomName];
-  r.players = r.players.filter(p => p.id !== socket.id);
-  socket.leave(roomName);
-  socket.data.room = null;
-
-  if (socket.id === r.hostId || r.players.length === 0) {
-    delete rooms[roomName];
-  }
-}
-
-function sendRoomsList() {
-  io.emit(
-    "rooms_list",
-    Object.values(rooms).map(r => ({
-      name: r.name,
-      players: r.players.length,
-      started: r.started
-    }))
-  );
-}
-
-server.listen(3000, "0.0.0.0");
+server.listen(3000, () => {
+  console.log("🚀 Servidor en http://localhost:3000");
+});
