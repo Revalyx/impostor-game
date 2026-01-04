@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Impostor Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "Nunito", system-ui, sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.06), transparent 45%),
+        linear-gradient(135deg, #1f1c2c, #928dab);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -27,16 +32,22 @@
     }
 
     .card {
-      background: white;
-      border-radius: 26px;
-      padding: 30px;
-      box-shadow: 0 25px 60px rgba(0,0,0,.25);
+      background: linear-gradient(180deg, #fff, #fff7f3);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.35);
+      animation: pop .5s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(.95); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
     }
 
     .title {
       font-family: "Fredoka", cursive;
       text-align: center;
-      font-size: 2rem;
+      font-size: 2.1rem;
       color: #ff4d4d;
       margin-bottom: 16px;
     }
@@ -44,16 +55,21 @@
     .subtitle {
       text-align: center;
       font-weight: 700;
-      margin: 20px 0 12px;
+      margin: 18px 0 12px;
     }
 
     input {
       width: 100%;
       padding: 14px;
       margin-bottom: 12px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 2px solid #eee;
       font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #ff7a7a;
     }
 
     .btn {
@@ -65,21 +81,54 @@
       font-weight: 700;
       cursor: pointer;
       margin-bottom: 10px;
+      transition: transform .1s ease, box-shadow .1s ease;
     }
 
-    .primary { background: linear-gradient(135deg,#ff4d4d,#ff884d); color:white; }
-    .secondary { background: linear-gradient(135deg,#6a89ff,#9f9cff); color:white; }
-    .danger { background: linear-gradient(135deg,#ff3b3b,#ff6b6b); color:white; }
+    .btn:active {
+      transform: scale(.97);
+    }
 
-    ul { list-style: none; padding: 0; margin: 0; }
+    .primary {
+      background: linear-gradient(135deg,#ff4d4d,#ff884d);
+      color: white;
+      box-shadow: 0 10px 25px rgba(255,77,77,.45);
+    }
 
-    .rooms-grid { display: grid; gap: 12px; }
+    .secondary {
+      background: linear-gradient(135deg,#6a89ff,#9f9cff);
+      color: white;
+      box-shadow: 0 10px 25px rgba(106,137,255,.45);
+    }
+
+    .danger {
+      background: linear-gradient(135deg,#ff3b3b,#ff6b6b);
+      color: white;
+      box-shadow: 0 10px 25px rgba(255,59,59,.45);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .rooms-grid {
+      display: grid;
+      gap: 12px;
+    }
 
     .room-card {
-      background: #fff1ec;
+      background: linear-gradient(135deg,#fff0ea,#ffe2d6);
       border-radius: 18px;
       padding: 14px;
       cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .room-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,.15);
     }
 
     .players {
@@ -87,20 +136,20 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-bottom: 16px;
     }
 
     .players li {
-      background: #f0f0ff;
+      background: #eef1ff;
       padding: 8px 14px;
       border-radius: 999px;
       font-weight: 700;
     }
 
-    /* CARD REVEAL */
     .card-reveal {
       perspective: 1000px;
-      width: 220px;
-      height: 140px;
+      width: 240px;
+      height: 150px;
       margin: 20px auto;
     }
 
@@ -121,13 +170,15 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: 20px;
+      border-radius: 22px;
       backface-visibility: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: "Fredoka", cursive;
       font-size: 1.5rem;
+      text-align: center;
+      padding: 12px;
     }
 
     .card-front {
@@ -139,14 +190,12 @@
       background: linear-gradient(135deg,#ffecd2,#fcb69f);
       transform: rotateY(180deg);
       color: #333;
-      text-align: center;
-      padding: 10px;
     }
 
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.4);
+      background: rgba(0,0,0,.45);
       display: none;
       justify-content: center;
       align-items: center;
@@ -158,6 +207,7 @@
       border-radius: 24px;
       width: 90%;
       max-width: 360px;
+      box-shadow: 0 30px 60px rgba(0,0,0,.35);
     }
   </style>
 </head>
@@ -171,7 +221,7 @@
 
     <!-- LOGIN -->
     <div id="login">
-      <input id="nameInput" placeholder="¿Cómo te llamas?">
+      <input id="nameInput" placeholder="¿Cómo te llamas?" />
       <button id="joinBtn" class="btn primary">Entrar</button>
     </div>
 
@@ -196,7 +246,9 @@
       <div id="cardReveal" class="card-reveal">
         <div class="card-inner">
           <div class="card-front">🃏</div>
-          <div class="card-back"><h2 id="roleText"></h2></div>
+          <div class="card-back">
+            <h2 id="roleText"></h2>
+          </div>
         </div>
       </div>
       <h1 id="timerText"></h1>
@@ -212,8 +264,8 @@
 <!-- MODAL -->
 <div id="createRoomModal" class="modal">
   <div class="modal-card">
-    <input id="roomName" placeholder="Nombre sala">
-    <input id="roomPassword" placeholder="Contraseña">
+    <input id="roomName" placeholder="Nombre sala" />
+    <input id="roomPassword" placeholder="Contraseña (opcional)" />
     <button id="createRoomBtn" class="btn primary">Crear</button>
     <button id="closeCreateRoomModal" class="btn danger">Cancelar</button>
   </div>
@@ -221,5 +273,6 @@
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="app.js"></script>
+
 </body>
 </html>

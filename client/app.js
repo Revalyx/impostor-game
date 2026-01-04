@@ -1,19 +1,20 @@
-const socket = io("http://localhost:3000");
+const socket = io("http://217.154.185.231:3000/");
 
 let isHost = false;
+let currentPlayersCount = 0;
 
-// VISTAS
+// ================= VISTAS =================
 const loginDiv = document.getElementById("login");
 const menuDiv = document.getElementById("menu");
 const roomDiv = document.getElementById("room");
 const gameDiv = document.getElementById("game");
 
-// LOGIN
+// ================= LOGIN =================
 const nameInput = document.getElementById("nameInput");
 const joinBtn = document.getElementById("joinBtn");
 const playerNameSpan = document.getElementById("playerName");
 
-// LOBBY
+// ================= LOBBY =================
 const roomsContainer = document.getElementById("roomsContainer");
 const openCreateRoomModal = document.getElementById("openCreateRoomModal");
 const closeCreateRoomModal = document.getElementById("closeCreateRoomModal");
@@ -22,12 +23,12 @@ const roomNameInput = document.getElementById("roomName");
 const roomPasswordInput = document.getElementById("roomPassword");
 const createRoomBtn = document.getElementById("createRoomBtn");
 
-// SALA
+// ================= SALA =================
 const playersList = document.getElementById("playersList");
 const startGameBtn = document.getElementById("startGameBtn");
 const leaveRoomBtn = document.getElementById("leaveRoomBtn");
 
-// JUEGO
+// ================= JUEGO =================
 const cardReveal = document.getElementById("cardReveal");
 const roleText = document.getElementById("roleText");
 const timerText = document.getElementById("timerText");
@@ -53,7 +54,7 @@ socket.on("name_confirmed", name => {
 
 // ================= MODAL =================
 openCreateRoomModal.onclick = () => {
-  createRoomModal.style.display = "block";
+  createRoomModal.style.display = "flex";
 };
 
 closeCreateRoomModal.onclick = () => {
@@ -76,7 +77,6 @@ createRoomBtn.onclick = () => {
 
 // ================= LISTA DE SALAS =================
 socket.on("rooms_list", rooms => {
-    console.log("📥 ROOMS_LIST CLIENT:", rooms); // 👈 CLAVE
   roomsContainer.innerHTML = "";
 
   if (!rooms.length) {
@@ -84,75 +84,66 @@ socket.on("rooms_list", rooms => {
     return;
   }
 
-rooms.forEach(room => {
-  const card = document.createElement("div");
-  card.className = "room-card";
+  rooms.forEach(room => {
+    const card = document.createElement("div");
+    card.className = "room-card";
 
-  card.innerHTML = `
-    <div class="room-title">🏠 ${room.name}</div>
-    <div class="room-meta">
-      👥 ${room.players} jugadores
-      ${room.hasPassword ? " 🔒" : ""}
-    </div>
-  `;
+    card.innerHTML = `
+      <div class="room-title">🏠 ${room.name}</div>
+      <div class="room-meta">
+        👥 ${room.players} jugadores ${room.hasPassword ? "🔒" : ""}
+      </div>
+    `;
 
-card.onclick = () => {
-  let password = "";
+    card.onclick = () => {
+      let password = "";
+      if (room.hasPassword) {
+        password = prompt("Contraseña de la sala");
+        if (password === null) return;
+      }
 
-  if (room.hasPassword) {
-    password = prompt("Contraseña de la sala");
-    if (password === null) return;
-  }
+      socket.emit("join_room", {
+        roomId: room.id,
+        password
+      });
+    };
 
-  console.log("🟡 CLICK JOIN", room.id);
-
-  socket.emit("join_room", {
-    roomId: room.id,
-    password
+    roomsContainer.appendChild(card);
   });
-};
-
-
-
-
-  roomsContainer.appendChild(card);
 });
 
-});
 
+// ================= ESTADO DE SALA =================
 socket.on("room_state", data => {
   socket.currentRoomId = data.roomId;
 
+  // 🔥 CLAVE ABSOLUTA: aquí se actualiza el host
+  isHost = socket.id === data.hostId;
+
   menuDiv.style.display = "none";
   roomDiv.style.display = "block";
+  gameDiv.style.display = "none";
 
+  currentPlayersCount = data.players.length;
   renderPlayers(data.players);
 
-  startGameBtn.style.display =
-    socket.id === data.hostId ? "block" : "none";
+  if (isHost) {
+    startGameBtn.style.display = "block";
+
+    if (currentPlayersCount < 3) {
+      startGameBtn.disabled = true;
+      startGameBtn.textContent = "Esperando jugadores… (mín. 3)";
+    } else {
+      startGameBtn.disabled = false;
+      startGameBtn.textContent = "Iniciar partida";
+    }
+  } else {
+    startGameBtn.style.display = "none";
+  }
 });
 
 
-
-
-
-
-// ================= SALA =================
-socket.on("joined_room", ({ players, isHost: host }) => {
-  isHost = host;
-
-  menuDiv.style.display = "none";
-  roomDiv.style.display = "block";
-
-  startGameBtn.style.display = isHost ? "block" : "none";
-
-  renderPlayers(players);
-});
-
-socket.on("players_update", players => {
-  renderPlayers(players);
-});
-
+// ================= RENDER JUGADORES =================
 function renderPlayers(players) {
   playersList.innerHTML = "";
   players.forEach(p => {
@@ -162,13 +153,28 @@ function renderPlayers(players) {
   });
 }
 
+
+// ================= SALIR DE SALA =================
 leaveRoomBtn.onclick = () => {
   socket.emit("leave_room");
+
   roomDiv.style.display = "none";
+  gameDiv.style.display = "none";
   menuDiv.style.display = "block";
+
+  playersList.innerHTML = "";
 };
 
+
+// ================= INICIAR PARTIDA =================
 startGameBtn.onclick = () => {
+  if (!isHost) return;
+
+  if (currentPlayersCount < 3) {
+    alert("Se necesitan al menos 3 jugadores para empezar.");
+    return;
+  }
+
   socket.emit("start_game");
 };
 
@@ -213,14 +219,6 @@ socket.on("reveal_role", data => {
   }, 300);
 });
 
-socket.on("host_changed", ({ hostId }) => {
-  isHost = socket.id === hostId;
-  startGameBtn.style.display = isHost ? "block" : "none";
-  newRoundBtn.style.display = isHost ? "block" : "none";
-  endGameBtn.style.display = isHost ? "block" : "none";
-});
-
-
 socket.on("starter_selected", ({ name, hostId }) => {
   starterText.textContent = `Empieza: ${name}`;
 
@@ -229,9 +227,20 @@ socket.on("starter_selected", ({ name, hostId }) => {
   endGameBtn.style.display = amIHost ? "block" : "none";
 });
 
-socket.on("room_closed", () => {
-  socket.currentRoomId = null;
 
+// ================= NUEVA RONDA / FIN =================
+newRoundBtn.onclick = () => socket.emit("new_round");
+endGameBtn.onclick = () => socket.emit("end_game");
+
+socket.on("game_ended", () => {
+  gameDiv.style.display = "none";
+  roomDiv.style.display = "block";
+
+  newRoundBtn.style.display = "none";
+  endGameBtn.style.display = "none";
+});
+
+socket.on("room_closed", () => {
   gameDiv.style.display = "none";
   roomDiv.style.display = "none";
   menuDiv.style.display = "block";
@@ -241,22 +250,3 @@ socket.on("room_closed", () => {
   newRoundBtn.style.display = "none";
   endGameBtn.style.display = "none";
 });
-
-
-
-
-newRoundBtn.onclick = () => socket.emit("new_round");
-endGameBtn.onclick = () => socket.emit("end_game");
-
-socket.on("game_ended", () => {
-  gameDiv.style.display = "none";
-  roomDiv.style.display = "block";
-
-  // 🔥 VOLVER A MOSTRAR BOTÓN INICIAR SI ERES HOST
-  startGameBtn.style.display = isHost ? "block" : "none";
-
-  // 🔥 OCULTAR LOS OTROS
-  newRoundBtn.style.display = "none";
-  endGameBtn.style.display = "none";
-});
-
