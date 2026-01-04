@@ -5,21 +5,21 @@
   <title>Impostor Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Tipografías divertidas -->
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "Nunito", system-ui, sans-serif;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 40%),
-        radial-gradient(circle at 80% 30%, rgba(255,255,255,.06), transparent 45%),
-        linear-gradient(135deg, #1f1c2c, #928dab);
+        radial-gradient(circle at 10% 10%, #ffe29f 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, #ffa99f 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, #a1c4fd 0%, transparent 40%),
+        #fff8ef;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -28,48 +28,51 @@
     .container {
       width: 100%;
       max-width: 420px;
-      padding: 20px;
+      padding: 16px;
     }
 
     .card {
-      background: linear-gradient(180deg, #fff, #fff7f3);
+      background: #ffffff;
       border-radius: 28px;
-      padding: 28px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.35);
-      animation: pop .5s ease;
+      padding: 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.15);
+      animation: pop .4s ease;
     }
 
     @keyframes pop {
-      from { transform: scale(.95); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
+      from { transform: scale(.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .title {
-      font-family: "Fredoka", cursive;
+      font-family: "Baloo 2", cursive;
       text-align: center;
-      font-size: 2.1rem;
-      color: #ff4d4d;
-      margin-bottom: 16px;
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      color: #ff5c5c;
+      letter-spacing: .5px;
     }
 
     .subtitle {
       text-align: center;
       font-weight: 700;
-      margin: 18px 0 12px;
+      margin: 16px 0 10px;
+      color: #444;
     }
 
     input {
       width: 100%;
-      padding: 14px;
+      padding: 14px 16px;
       margin-bottom: 12px;
       border-radius: 18px;
-      border: 2px solid #eee;
+      border: 2px solid #f0f0f0;
       font-size: 1rem;
+      background: #fffdfb;
     }
 
     input:focus {
       outline: none;
-      border-color: #ff7a7a;
+      border-color: #ffb703;
     }
 
     .btn {
@@ -78,10 +81,11 @@
       border-radius: 18px;
       border: none;
       font-size: 1.05rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       margin-bottom: 10px;
-      transition: transform .1s ease, box-shadow .1s ease;
+      transition: transform .1s ease;
+      font-family: "Baloo 2", cursive;
     }
 
     .btn:active {
@@ -89,67 +93,74 @@
     }
 
     .primary {
-      background: linear-gradient(135deg,#ff4d4d,#ff884d);
+      background: #ff5c5c;
       color: white;
-      box-shadow: 0 10px 25px rgba(255,77,77,.45);
     }
 
     .secondary {
-      background: linear-gradient(135deg,#6a89ff,#9f9cff);
+      background: #4dabf7;
       color: white;
-      box-shadow: 0 10px 25px rgba(106,137,255,.45);
     }
 
     .danger {
-      background: linear-gradient(135deg,#ff3b3b,#ff6b6b);
+      background: #ff8787;
       color: white;
-      box-shadow: 0 10px 25px rgba(255,59,59,.45);
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
+    /* LOBBY */
     .rooms-grid {
       display: grid;
       gap: 12px;
     }
 
     .room-card {
-      background: linear-gradient(135deg,#fff0ea,#ffe2d6);
+      background: #fff1f1;
       border-radius: 18px;
       padding: 14px;
       cursor: pointer;
       font-weight: 700;
-      transition: transform .15s ease, box-shadow .15s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform .1s ease;
     }
 
     .room-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0,0,0,.15);
+      transform: scale(1.02);
     }
 
-    .players {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 16px;
+    .room-meta {
+      font-size: .9rem;
+      opacity: .7;
     }
 
-    .players li {
-      background: #eef1ff;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-weight: 700;
-    }
+    /* ROOM */
+.players{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:12px;
+  margin-bottom:16px;
+  list-style: none;
+}
 
+.players li{
+  background:linear-gradient(135deg,#6a89ff,#9f9cff);
+  color:white;
+  padding:14px;
+  border-radius:18px;
+  text-align:center;
+  font-size:1rem;
+  box-shadow:0 6px 0 rgba(0,0,0,.15);
+  list-style: none;
+}
+
+
+    /* GAME */
     .card-reveal {
       perspective: 1000px;
-      width: 240px;
-      height: 150px;
+      width: 100%;
+      max-width: 260px;
+      height: 160px;
       margin: 20px auto;
     }
 
@@ -158,7 +169,7 @@
       height: 100%;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform .8s ease;
+      transition: transform .7s ease;
     }
 
     .card-reveal.flipped .card-inner {
@@ -168,34 +179,55 @@
     .card-front,
     .card-back {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 22px;
+      inset: 0;
+      border-radius: 24px;
       backface-visibility: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: "Fredoka", cursive;
-      font-size: 1.5rem;
       text-align: center;
-      padding: 12px;
+      padding: 16px;
+      font-family: "Baloo 2", cursive;
     }
 
     .card-front {
-      background: linear-gradient(135deg,#6a89ff,#9f9cff);
-      color: white;
+      background: #ffd166;
+      font-size: 3rem;
     }
 
     .card-back {
-      background: linear-gradient(135deg,#ffecd2,#fcb69f);
+      background: #06d6a0;
       transform: rotateY(180deg);
-      color: #333;
+      color: #073b4c;
+      font-size: 1.8rem;
+      word-break: break-word;
     }
 
+    #timerText {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    #starterText {
+      text-align: center;
+      font-weight: 800;
+      margin: 10px 0;
+      color: #555;
+    }
+
+    #hintText {
+      text-align: center;
+      opacity: .8;
+      margin-bottom: 12px;
+    }
+
+    /* MODAL */
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.45);
+      background: rgba(0,0,0,.5);
       display: none;
       justify-content: center;
       align-items: center;
@@ -203,11 +235,11 @@
 
     .modal-card {
       background: white;
-      padding: 24px;
+      padding: 22px;
       border-radius: 24px;
       width: 90%;
       max-width: 360px;
-      box-shadow: 0 30px 60px rgba(0,0,0,.35);
+      box-shadow: 0 20px 40px rgba(0,0,0,.25);
     }
   </style>
 </head>
@@ -217,7 +249,7 @@
 <div class="container">
   <div class="card">
 
-    <h1 class="title">🕵️‍♂️ Impostor Game</h1>
+    <h1 class="title">EL IMPOSTOR</h1>
 
     <!-- LOGIN -->
     <div id="login">
@@ -227,17 +259,18 @@
 
     <!-- LOBBY -->
     <div id="menu" style="display:none;">
-      <p>Hola <strong id="playerName"></strong></p>
-      <button id="openCreateRoomModal" class="btn secondary">➕ Crear sala</button>
-      <h2 class="subtitle">Salas</h2>
+      <p>¡Hola!  <strong id="playerName"></strong></p>
+      <button id="openCreateRoomModal" class="btn primary">Crear sala</button>
+      <h2 class="subtitle">Salas disponibles</h2>
+      <hr>
       <div id="roomsContainer" class="rooms-grid"></div>
     </div>
 
     <!-- ROOM -->
     <div id="room" style="display:none;">
-      <h2 class="subtitle">Jugadores</h2>
+      <h2 class="subtitle">Jugadores conectados</h2>
       <ul id="playersList" class="players"></ul>
-      <button id="startGameBtn" class="btn primary" style="display:none;">Iniciar partida</button>
+      <button id="startGameBtn" class="btn primary" style="display:none;">Empezar</button>
       <button id="leaveRoomBtn" class="btn danger">Salir</button>
     </div>
 
@@ -245,16 +278,16 @@
     <div id="game" style="display:none;">
       <div id="cardReveal" class="card-reveal">
         <div class="card-inner">
-          <div class="card-front">🃏</div>
+          <div class="card-front">🤫</div>
           <div class="card-back">
-            <h2 id="roleText"></h2>
+            <span id="roleText"></span>
           </div>
         </div>
       </div>
-      <h1 id="timerText"></h1>
-      <h3 id="starterText"></h3>
-      <p id="hintText"></p>
-      <button id="newRoundBtn" class="btn secondary" style="display:none;">Nueva ronda</button>
+      <div id="timerText"></div>
+      <div id="starterText"></div>
+      <div id="hintText"></div>
+      <button id="newRoundBtn" class="btn secondary" style="display:none;">Otra ronda</button>
       <button id="endGameBtn" class="btn danger" style="display:none;">Terminar</button>
     </div>
 
@@ -264,7 +297,7 @@
 <!-- MODAL -->
 <div id="createRoomModal" class="modal">
   <div class="modal-card">
-    <input id="roomName" placeholder="Nombre sala" />
+    <input id="roomName" placeholder="Nombre de la sala" />
     <input id="roomPassword" placeholder="Contraseña (opcional)" />
     <button id="createRoomBtn" class="btn primary">Crear</button>
     <button id="closeCreateRoomModal" class="btn danger">Cancelar</button>
