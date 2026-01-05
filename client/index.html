@@ -2,273 +2,251 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Impostor Game</title>
+  <title>El Impostor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tipografías divertidas -->
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Nunito", system-ui, sans-serif;
-      background:
-        radial-gradient(circle at 10% 10%, #ffe29f 0%, transparent 40%),
-        radial-gradient(circle at 90% 20%, #ffa99f 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, #a1c4fd 0%, transparent 40%),
-        #fff8ef;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Nunito",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 20% 15%, #fff1c1 0%, transparent 45%),
+    radial-gradient(circle at 80% 25%, #ffd6d6 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, #dbeafe 0%, transparent 50%),
+    #f7f3eb;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#2b2b2b;
+}
 
-    .container {
-      width: 100%;
-      max-width: 420px;
-      padding: 16px;
-    }
+/* CONTENEDOR */
+.container{
+  width:100%;
+  max-width:420px;
+  padding:16px;
+}
 
-    .card {
-      background: #ffffff;
-      border-radius: 28px;
-      padding: 26px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.15);
-      animation: pop .4s ease;
-      position:relative
-    }
+/* CARD */
+.card{
+  background:#ffffff;
+  border-radius:24px;
+  padding:56px 22px 26px;
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.12),
+    inset 0 0 0 2px #f3efe5;
+  position:relative;
+  animation:fadeUp .35s ease;
+}
 
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
+@keyframes fadeUp{
+  from{transform:translateY(10px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
 
-    .title {
-      font-family: "Baloo 2", cursive;
-      text-align: center;
-      font-size: 2.4rem;
-      margin-bottom: 10px;
-      color: #ff5c5c;
-      letter-spacing: .5px;
-    }
+/* TITULO */
+.title{
+  font-family:"Baloo 2",cursive;
+  text-align:center;
+  font-size:2.4rem;
+  margin:0 0 16px;
+  color:#c0392b;
+  letter-spacing:1px;
+}
 
-    .subtitle {
-      text-align: center;
-      font-weight: 700;
-      margin: 16px 0 10px;
-      color: #444;
-    }
+/* SUBTITULOS */
+.subtitle{
+  text-align:center;
+  margin:18px 0 10px;
+  font-weight:700;
+  color:#555;
+}
 
-    input {
-      width: 100%;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      border-radius: 18px;
-      border: 2px solid #f0f0f0;
-      font-size: 1rem;
-      background: #fffdfb;
-    }
+/* INPUTS */
+input{
+  width:100%;
+  padding:14px 16px;
+  margin-bottom:14px;
+  border-radius:14px;
+  border:2px solid #e5e1d8;
+  font-size:1rem;
+  background:#fff;
+}
 
-    input:focus {
-      outline: none;
-      border-color: #ffb703;
-    }
+input::placeholder{color:#aaa}
 
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 18px;
-      border: none;
-      font-size: 1.05rem;
-      font-weight: 800;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: transform .1s ease;
-      font-family: "Baloo 2", cursive;
-    }
+input:focus{
+  outline:none;
+  border-color:#c0392b;
+}
 
-    .btn:active {
-      transform: scale(.97);
-    }
+/* BOTONES */
+.btn{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-size:1.05rem;
+  font-weight:800;
+  cursor:pointer;
+  margin-bottom:14px;
+  font-family:"Baloo 2",cursive;
+}
 
-    .primary {
-      background: #ff5c5c;
-      color: white;
-    }
+.primary{
+  background:#c0392b;
+  color:white;
+  box-shadow:0 4px 0 #922b21;
+}
 
-    .secondary {
-      background: #4dabf7;
-      color: white;
-    }
+.secondary{
+  background:#2980b9;
+  color:white;
+  box-shadow:0 4px 0 #1f618d;
+}
 
-    .danger {
-      background: #ff8787;
-      color: white;
-    }
+.danger{
+  background:#27ae60;
+  color:white;
+  box-shadow:0 4px 0 #1e8449;
+}
 
-    /* LOBBY */
-    .rooms-grid {
-      display: grid;
-      gap: 12px;
-    }
+.btn:active{
+  transform:translateY(3px);
+  box-shadow:none;
+}
 
-    .room-card {
-      background: #fff1f1;
-      border-radius: 18px;
-      padding: 14px;
-      cursor: pointer;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform .1s ease;
-    }
+/* LOBBY */
+.rooms-grid{
+  display:grid;
+  gap:12px;
+}
 
-    .room-card:hover {
-      transform: scale(1.02);
-    }
+.room-card{
+  background:#faf7f2;
+  border:2px dashed #e0d8c8;
+  border-radius:14px;
+  padding:14px;
+  font-weight:700;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .room-meta {
-      font-size: .9rem;
-      opacity: .7;
-    }
-
-    /* ROOM */
+/* JUGADORES */
 .players{
   display:grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:12px;
   margin:0 auto 16px;
   padding:0;
-  max-width:260px;  
+  max-width:260px;
 }
 
-
 .players li{
-  background:linear-gradient(135deg,#6a89ff,#9f9cff);
-  color:white;
+  list-style:none;
+  background:#ecf0f1;
   padding:14px;
-  border-radius:18px;
+  border-radius:14px;
   text-align:center;
-  font-size:1rem;
-  box-shadow:0 6px 0 rgba(0,0,0,.15);
-  list-style: none;
-    display:flex;
+  font-weight:700;
+  border:2px solid #d5dbdb;
+}
+
+/* CARTA */
+.card-reveal{
+  perspective:1000px;
+  width:100%;
+  max-width:260px;
+  height:160px;
+  margin:22px auto;
+}
+
+.card-inner{
+  width:100%;
+  height:100%;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .6s ease;
+}
+
+.card-reveal.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-front,.card-back{
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  backface-visibility:hidden;
+  display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
+  font-family:"Baloo 2",cursive;
 }
 
+.card-front{
+  background:#f9e79f;
+  font-size:3rem;
+}
 
-    /* GAME */
-    .card-reveal {
-      perspective: 1000px;
-      width: 100%;
-      max-width: 260px;
-      height: 160px;
-      margin: 20px auto;
-    }
+.card-back{
+  background:#82e0aa;
+  transform:rotateY(180deg);
+  color:#145a32;
+  font-size:1.8rem;
+}
 
-    .card-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform .7s ease;
-    }
-
-    .card-reveal.flipped .card-inner {
-      transform: rotateY(180deg);
-    }
-
-    .card-front,
-    .card-back {
-      position: absolute;
-      inset: 0;
-      border-radius: 24px;
-      backface-visibility: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 16px;
-      font-family: "Baloo 2", cursive;
-    }
-
-    .card-front {
-      background: #ffd166;
-      font-size: 3rem;
-    }
-
-    .card-back {
-      background: #06d6a0;
-      transform: rotateY(180deg);
-      color: #073b4c;
-      font-size: 1.8rem;
-      word-break: break-word;
-    }
-
-    #timerText {
-      text-align: center;
-      font-size: 1.3rem;
-      font-weight: 800;
-      margin-top: 8px;
-    }
-
-    #starterText {
-      text-align: center;
-      font-weight: 800;
-      margin: 10px 0;
-      color: #555;
-    }
-
-    #hintText {
-      text-align: center;
-      opacity: .8;
-      margin-bottom: 12px;
-    }
-
-    /* MODAL */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-card {
-      background: white;
-      padding: 22px;
-      border-radius: 24px;
-      width: 90%;
-      max-width: 360px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.25);
-    }
-
-    .help-btn{
-  position:absolute;
-  top:20px;
-  right:20px;
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:none;
-  background:#ffd166;
+/* TEXTO JUEGO */
+#timerText{
+  text-align:center;
   font-size:1.2rem;
   font-weight:800;
+  margin:10px 0;
+}
+
+/* MODALES */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+  z-index:1000;
+}
+
+.modal-card{
+  background:#ffffff;
+  padding:22px;
+  border-radius:20px;
+  width:100%;
+  max-width:360px;
+  max-height:85vh;
+  overflow-y:auto;
+}
+
+/* BOTÓN AYUDA */
+.help-btn{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:none;
+  background:#f9e79f;
+  font-weight:900;
   cursor:pointer;
-  box-shadow:0 6px 0 rgba(0,0,0,.15);
 }
-
-.help-btn:active{
-  transform:scale(.95);
-}
-
-
   </style>
 </head>
 
@@ -278,25 +256,21 @@
   <div class="card">
 
     <h1 class="title">EL IMPOSTOR</h1>
-    <button id="helpBtn" class="help-btn" aria-label="Cómo jugar">❓</button>
+    <button id="helpBtn" class="help-btn">?</button>
 
-
-    <!-- LOGIN -->
     <div id="login">
       <input id="nameInput" placeholder="¿Cómo te llamas?" />
       <button id="joinBtn" class="btn primary">Entrar</button>
     </div>
 
-    <!-- LOBBY -->
     <div id="menu" style="display:none;">
-      <p>¡Hola!  <strong id="playerName"></strong></p>
+      <p>¡Hola <strong id="playerName"></strong>! Crea o únete a una sala para empezar a jugar.</p>
       <button id="openCreateRoomModal" class="btn primary">Crear sala</button>
       <h2 class="subtitle">Salas disponibles</h2>
       <hr>
       <div id="roomsContainer" class="rooms-grid"></div>
     </div>
 
-    <!-- ROOM -->
     <div id="room" style="display:none;">
       <h2 class="subtitle">Jugadores conectados</h2>
       <ul id="playersList" class="players"></ul>
@@ -304,27 +278,21 @@
       <button id="leaveRoomBtn" class="btn danger">Salir</button>
     </div>
 
-    <!-- GAME -->
     <div id="game" style="display:none;">
       <div id="cardReveal" class="card-reveal">
         <div class="card-inner">
-          <div class="card-front">🤫</div>
-          <div class="card-back">
-            <span id="roleText"></span>
-          </div>
+          <div class="card-front">🃏</div>
+          <div class="card-back"><span id="roleText"></span></div>
         </div>
       </div>
       <div id="timerText"></div>
-      <div id="starterText"></div>
-      <div id="hintText"></div>
       <button id="newRoundBtn" class="btn secondary" style="display:none;">Otra ronda</button>
-      <button id="endGameBtn" class="btn danger" style="display:none;">Terminar</button>
+      <button id="endGameBtn" class="btn danger">Terminar</button>
     </div>
 
   </div>
 </div>
 
-<!-- MODAL -->
 <div id="createRoomModal" class="modal">
   <div class="modal-card">
     <input id="roomName" placeholder="Nombre de la sala" />
@@ -337,33 +305,15 @@
 <div id="helpModal" class="modal">
   <div class="modal-card">
     <h2 class="subtitle">Cómo jugar</h2>
-
-    <p><strong>1. Inicio de ronda</strong><br>
-    La app asigna una palabra secreta y un impostor.</p>
-
-    <p><strong>2. Juego en persona</strong><br>
-    Todos juegan hablando en persona. La app solo muestra la palabra.</p>
-
-    <p><strong>3. Durante la ronda</strong><br>
-    Hay que decir palabras en orden relacionadas con la que aparece en la app. El impostor tiene que intentar disimular hsata que adivine la palabra.</p>
-
-    <p><strong>4. Nueva ronda</strong><br>
-    Cuando termina la ronda, el <strong>host</strong> pulsa <em>Otra ronda</em>.</p>
-
-    <p><strong>5. Importante</strong><br>
-    Cada ronda genera una nueva palabra y un nuevo impostor.<br>
-    Solo el host puede iniciar una nueva ronda.</p>
-    
-
+    <p><strong>1.</strong> La aplicación escoge una palabra y un impostor y decide quién empieza</p>
+    <p><strong>2.</strong> En orden, los que saben la palabra tienen que describirla, pero intentando no ser muy obvios.</p>
+    <p><strong>3.</strong> El impostor tiene que decir palabras que crea que están relacionadas con las que dicen el resto, y su misión es adivinar la palabra original.</p>
     <button id="closeHelpModal" class="btn primary">Entendido</button>
   </div>
 </div>
 
-
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="app.js"></script>
-
-
 
 </body>
 </html>
